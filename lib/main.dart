@@ -93,6 +93,7 @@ class HomePage extends StatelessWidget {
                         action: SnackBarAction(
                           label: 'Undo',
                           onPressed: () {
+                            showDialog(context: context, builder: (BuildContext context) => loginDialog);
                           },
                         ),
                       );
@@ -106,4 +107,26 @@ class HomePage extends StatelessWidget {
         ),
       );
   }
+
+  Dialog loginDialog = Dialog(
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16)
+    ),
+    child: Container(
+      decoration: BoxDecoration(
+        color: Colors.deepPurple,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Login now"),
+           
+          ],
+        ),
+      ),
+    ),
+  );
 }
