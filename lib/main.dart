@@ -11,56 +11,99 @@ class PartyGames extends StatelessWidget {
         primarySwatch: Colors.deepPurple,
       ),
       home: Scaffold(
+        backgroundColor: Color(0xFF8f92c9),
         appBar: AppBar(
           title: Text('Games Library'),
         ),
-        body: buildCard(context) // This creates the body of the page
+        body: HomePage() // This creates the body of the page
       ),
     );
   }
+}
 
-  Widget buildCard(BuildContext context) {
+class HomePage extends StatelessWidget {
+  Widget build(BuildContext context) {
+    var cards = <Widget>[
+      generateGameCard(context, 'Pixenary', "Can you guess what picture the pixel master is piecing together? The first person to work out what the picture is takes the victory - for now at least!"),
+      generateGameCard(context, 'Balderdash', "Got Balderdash and find passing the paper around in secret nightmarish? Just a tree hugger and don't want to see more get the chop? - either way, don't worry, we've got you covered!"),
+      generateGameCard(context, 'Thoughts & Crosses', "9 categories, 1 starting letter - mission: ensure each answer is unique to win big"),
+      generateGameCard(context, 'The Word Game', "A bunch of random letters, a short amount of time - mission: come up with as many words as possible before you're out of time"),
+    ];
+
     return Center(
-      child: generateGameCard(context, 'Pixenary', 'Can you guess what picture the pixel master is piecing together? The first person to work out what the picture is takes the victory - for now at least!'),
+      child: ListView(
+        children: cards,
+      )
     );
   }
 
   Widget generateGameCard(BuildContext context, String gameName, String gameDescription) {
     return Padding(
-      padding: EdgeInsets.all(32),
-      child: Card(
-        color: Colors.blueAccent,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(gameName),
-            ),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(
-                  gameDescription,
-                  textAlign: TextAlign.center
-              ),
-            ),
-            ButtonBar(
-              children: [
-                RaisedButton(
-                  child: Text('play'),
-                ),
-              ],
-            )
-          ],
-        ),
-        shape: RoundedRectangleBorder(
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 8,
+        bottom: 8,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(8.0)),
-          side: BorderSide(
-            color: Color(0xFF55EDBA),
+          border: Border.all(
             width: 1,
+            color: Color(0xFF55EDBA),
+          ),
+          gradient: LinearGradient(
+            colors: [Colors.deepPurple, Colors.blueGrey],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          )
+        ),
+        child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  gameName,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24.0,
+                  )
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                    gameDescription,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.0,
+                    ),
+                    textAlign: TextAlign.center
+                ),
+              ),
+              ButtonBar(
+                children: [
+                  RaisedButton(
+                    child: Text('play'),
+                    color: Colors.deepPurple,
+                    onPressed: () {
+                      final snackBar = SnackBar(
+                        content: Text('You want to play $gameName'),
+                        action: SnackBarAction(
+                          label: 'Undo',
+                          onPressed: () {
+                          },
+                        ),
+                      );
+                      Scaffold.of(context).showSnackBar(snackBar);
+                    }
+                  ),
+                ],
+              )
+            ],
           ),
         ),
-      ),
-    );
+      );
   }
 }
