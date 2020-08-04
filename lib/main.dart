@@ -23,7 +23,7 @@ class PartyGames extends StatelessWidget {
 
 class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
-    var cards = <Widget>[
+    final _cards = <Widget>[
       generateGameCard(context, 'Pixenary', "Can you guess what picture the pixel master is piecing together? The first person to work out what the picture is takes the victory - for now at least!"),
       generateGameCard(context, 'Balderdash', "Got Balderdash and find passing the paper around in secret nightmarish? Just a tree hugger and don't want to see more get the chop? - either way, don't worry, we've got you covered!"),
       generateGameCard(context, 'Thoughts & Crosses', "9 categories, 1 starting letter - mission: ensure each answer is unique to win big"),
@@ -32,7 +32,7 @@ class HomePage extends StatelessWidget {
 
     return Center(
       child: ListView(
-        children: cards,
+        children: _cards,
       )
     );
   }
@@ -87,17 +87,9 @@ class HomePage extends StatelessWidget {
                   RaisedButton(
                     child: Text('play'),
                     color: Colors.deepPurple,
-                    onPressed: () {
-                      final snackBar = SnackBar(
-                        content: Text('You want to play $gameName'),
-                        action: SnackBarAction(
-                          label: 'Undo',
-                          onPressed: () {
-                            showDialog(context: context, builder: (BuildContext context) => loginDialog);
-                          },
-                        ),
-                      );
-                      Scaffold.of(context).showSnackBar(snackBar);
+                    onPressed: () async {
+                      final result = await showDialog(context: context, builder: (BuildContext context) => loginDialog);
+                      Scaffold.of(context).showSnackBar(SnackBar(content: Text("$result")));
                     }
                   ),
                 ],
@@ -123,10 +115,56 @@ class HomePage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text("Login now"),
-           
+            LoginForm(),
           ],
         ),
       ),
     ),
   );
+}
+
+class LoginForm extends StatefulWidget {
+  @override
+  LoginFormState createState() {
+    return LoginFormState();
+  }
+}
+
+class LoginFormState extends State<LoginForm> {
+  final _formKey = GlobalKey<FormState>();
+  final userNameController = TextEditingController();
+
+  @override
+  void dispose() {
+    userNameController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: <Widget>[
+          TextFormField(
+            controller: userNameController,
+            validator: (value) {
+              if(value.isEmpty) {
+                return 'Please enter some text';
+              }
+              return null;
+            },
+          ),
+          RaisedButton(
+            onPressed: () {
+              if(_formKey.currentState.validate()) {
+                Navigator.pop(context, userNameController.text);
+              }
+            },
+            child: Text('Submit'),
+          )
+        ],
+      ),
+    );
+  }
 }
