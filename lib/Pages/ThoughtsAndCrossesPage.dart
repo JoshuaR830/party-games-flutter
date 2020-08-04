@@ -111,3 +111,42 @@ class _ThoughtsAndCrossesPageState extends State<ThoughtsAndCrossesPage> {
   }
 }
 
+class ThoughtsAndCrossesGrid extends StatefulWidget {
+  ThoughtsAndCrossesGrid({Key key}) : super(key: key);
+
+  _ThoughtsAndCrossesGridState createState() => _ThoughtsAndCrossesGridState();
+}
+
+class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
+
+  Widget _buildGrid() {
+    final _topics = <String>['Topic 1', 'Topic 2', 'Topic 3', 'Topic 4', 'Topic 5', 'Topic 6', 'Topic 7', 'Topic 8', 'Topic 9'];
+    final _gridItems = <Widget>[];
+
+    _topics.forEach((topic) => _gridItems.add(Container(
+      padding: EdgeInsets.all(4),
+      child: Center(
+        child: Text(topic),
+      ),
+      color: Colors.greenAccent[200],
+    )));
+
+    return GridView.count(
+      crossAxisCount: 3,
+      mainAxisSpacing: 10,
+      crossAxisSpacing: 10,
+      children: _gridItems,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SizedBox(
+        width: 200,
+        height: 200,
+        child: _buildGrid(),
+      ),
+    );
+  }
+}

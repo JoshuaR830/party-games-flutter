@@ -48,7 +48,7 @@ class PartyGames extends StatelessWidget {
           title: Text('Games Library'),
         ),
 //        body: GamesLibraryPage() // This creates the body of the page
-        body: ThoughtsAndCrossesPage() // This creates the body of the page
+        body: ThoughtsAndCrossesGrid() // This creates the body of the page
       ),
     );
   }
