@@ -84,29 +84,17 @@ class GamesLibraryPage extends StatelessWidget {
   }
 
   final Dialog loginDialog = Dialog(
+    backgroundColor: Color(0xFF8f92c9),
     shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16)
+        borderRadius: BorderRadius.circular(8)
     ),
-    child: Container(
-      decoration: BoxDecoration(
-        color: Color(0xFF8f92c9),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "Login now",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24.0,
-              ),
-            ),
-            LoginForm(),
-          ],
-        ),
+    child: Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          LoginForm(),
+        ],
       ),
     ),
   );
