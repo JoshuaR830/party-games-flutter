@@ -1,58 +1,58 @@
 import 'package:flutter/material.dart';
-import 'package:signalr_client/signalr_client.dart';
-import 'package:logging/logging.dart';
+import 'package:signalr_core/signalr_core.dart';
 
-import '../LoginForm.dart';
+import 'Dialog.dart';
 
-class ThoughtsAndCrossesPage extends StatelessWidget {
-   
+
+//final serverUrl = 'games-by-joshua.herokuapp.com/chatHub';
+final serverUrl = 'http://192.168.1.76:5001/chatHub';
+final connection = HubConnectionBuilder().withUrl(serverUrl,
+    HttpConnectionOptions(
+      logging: (level, message) => print(message),
+    )).build();
+
+Future _connectToHub() async {
+  connection.onclose((error) => print("Connection closed"));
+  await connection.start();
+  print('We got here');
+  connection.on('LoggedInUsers', (message) => print(message.toString()));
+  connection.on('ReceiveLetter', (message) => print(message.toString()));
+}
+
+class ThoughtsAndCrossesPage extends StatefulWidget {
+  ThoughtsAndCrossesPage({Key key}) : super(key: key);
+
+  _ThoughtsAndCrossesPageState createState() => _ThoughtsAndCrossesPageState();
+}
+
+class _ThoughtsAndCrossesPageState extends State<ThoughtsAndCrossesPage> {
+
+  @override
+  void initState() {
+    _connectToHub().then((value) {
+      print('Async done');
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-
-
-    Logger.root.level = Level.ALL;
-
-    Logger.root.onRecord.listen((record) {
-      print('${record.level.name}: ${record.time}: ${record.message}');
-    });
-
-    final logger = Logger('ThoughtsAndCrossesPage');
-
-    //final serverUrl = 'games-by-joshua.herokuapp.com/chatHub';
-    final serverUrl = 'http://192.168.1.76:5001/chatHub';
-    final hubConnection = HubConnectionBuilder().withUrl(serverUrl).configureLogging(logger).build();
-    hubConnection.onclose((error) => print("Connection closed"));
-
-    final Dialog loginDialog = Dialog(
-      backgroundColor: Color(0xFF8f92c9),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8)
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            LoginForm(),
-          ],
-        ),
-      ),
-    );
-
-    return Center(
+        return Center(
       child: RaisedButton(
         onPressed: () async {
           final name = await showDialog(context: context, builder: (BuildContext context) => loginDialog);
-          await hubConnection.start();
-          final result = await hubConnection.invoke("Startup", args: <Object>["GroupOfJoshua", name, 0]);
-          final result2 = await hubConnection.invoke("SetupNewUser", args: <Object>["GroupOfJoshua", name]);
-          logger.fine(result2);
+
+          await connection.invoke("AddToGroup", args: ['GroupOfJoshua']);
+          await connection.invoke('JoinRoom', args: ['GroupOfJoshua', name, 0]);
         },
-        child: Text('Smash this'),
+        color: Colors.deepPurple,
+        child: Text(
+          'Login',
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
       ),
     );
-
-
   }
-
 }
