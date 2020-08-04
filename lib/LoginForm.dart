@@ -56,14 +56,17 @@ class LoginFormState extends State<LoginForm> {
             ],
           ),
           Positioned(
-            top: -10,
-            right: -10,
+            top: -12,
+            right: -12,
+            width: 30,
+            height: 30,
             child: Ink(
               decoration: ShapeDecoration(
                 color: Colors.deepPurple,
                 shape: CircleBorder(),
               ),
               child: IconButton(
+                iconSize: 12,
                 color: Colors.white,
                 onPressed: () {
                   Navigator.pop(context, 'Cancelled');
