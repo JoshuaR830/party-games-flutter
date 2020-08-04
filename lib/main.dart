@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'Pages/GamesLibraryPage.dart';
+import 'Pages/ThoughtsAndCrossesPage.dart';
 
 void main() => runApp(PartyGames());
 
@@ -17,7 +18,8 @@ class PartyGames extends StatelessWidget {
         appBar: AppBar(
           title: Text('Games Library'),
         ),
-        body: GamesLibraryPage() // This creates the body of the page
+//        body: GamesLibraryPage() // This creates the body of the page
+        body: ThoughtsAndCrossesPage() // This creates the body of the page
       ),
     );
   }
