@@ -11,11 +11,24 @@ class GamesLibraryPage extends StatelessWidget {
       generateGameCard(context, 'The Word Game', "A bunch of random letters, a short amount of time - mission: come up with as many words as possible before you're out of time"),
     ];
 
-    return Center(
-        child: ListView(
-          children: _cards,
-        )
-    );
+
+    return MaterialApp(
+        title: 'Games Library',
+        theme: ThemeData(
+          primarySwatch: Colors.deepPurple,
+        ),
+        home: Scaffold(
+            backgroundColor: Color(0xFF8f92c9),
+            appBar: AppBar(
+              title: Text('Games Library'),
+            ),
+            body: Center(
+                child: ListView(
+                  children: _cards,
+                )
+            ), // This creates the body of the page
+        ),
+      );
   }
 
   Widget generateGameCard(BuildContext context, String gameName, String gameDescription) {

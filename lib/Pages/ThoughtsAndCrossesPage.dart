@@ -141,11 +141,23 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: SizedBox(
-        width: 200,
-        height: 200,
-        child: _buildGrid(),
+    return MaterialApp(
+      title: 'Thoughts & Crosses',
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+      ),
+      home: Scaffold(
+        backgroundColor: Color(0xFF8f92c9),
+        appBar: AppBar(
+          title: Text('Thoughts & Crosses'),
+        ),
+        body: Center(
+          child: SizedBox(
+            width: 300,
+            height: 300,
+            child: _buildGrid(),
+          ),
+        ),
       ),
     );
   }
