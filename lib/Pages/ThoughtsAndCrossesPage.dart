@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:signalr_core/signalr_core.dart';
+import '../presentation/custom_icons_icons.dart';
 
 import 'Dialog.dart';
 
@@ -151,14 +152,173 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
         appBar: AppBar(
           title: Text('Thoughts & Crosses'),
         ),
-        body: Center(
-          child: SizedBox(
-            width: 300,
-            height: 300,
-            child: _buildGrid(),
-          ),
-        ),
+        body: Stack(
+          children: <Widget>[
+            CornerInformation(
+              icon: Icons.edit,
+              isTop: true,
+              isLeft: true,
+              text: 'A',
+            ),
+            CornerInformation(
+              icon: Icons.alarm,
+              isTop: true,
+              isLeft: false,
+              text: 'B',
+            ),
+            CornerInformation(
+              icon: CustomIcons.Trophy,
+              isTop: false,
+              isLeft: true,
+              text: 'C',
+            ),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              width: 124,
+              height: 54,
+              child: Container(
+                child: Text('Hello'),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                ),
+              ),
+            ),
+            Center(
+              child: SizedBox(
+                width: 300,
+                height: 300,
+                child: _buildGrid(),
+              ),
+            ),
+          ],
+        )
       ),
     );
+  }
+}
+
+class CornerInformation extends StatefulWidget {
+  final IconData icon;
+  final String text;
+  final bool isTop;
+  final bool isLeft;
+
+  CornerInformation(
+    {@required this.icon,
+    @required this.isTop,
+    @required this.isLeft,
+    @required this.text,
+    }
+  );
+
+  @override
+  _CornerInformationState createState() => _CornerInformationState();
+}
+
+class _CornerInformationState extends State<CornerInformation> {
+  @override
+  Widget build(BuildContext context)
+  {
+    createButtonContent(BorderRadius radius) {
+      return Container(
+        child: Center(
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget> [
+                Padding(
+                  padding: EdgeInsets.all(4),
+                  child: Icon(
+                    widget.icon,
+                    color: Color(0xFF55edbb),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(4),
+                  child: Text(
+                    widget.text,
+                    style: TextStyle(
+                      color: Color(0xFF55edbb),
+                      fontSize: 24,
+                    ),
+                  ),
+                ),
+              ]
+          ),
+        ),
+        decoration: BoxDecoration(
+          color: Color(0xFF8f92c9),
+          borderRadius: radius,
+          boxShadow: [
+            BoxShadow(
+                color: Color(0xFF55edbb),
+                spreadRadius: 4,
+                blurRadius: 4.0
+            ),
+          ],
+        ),
+      );
+    }
+
+    BorderRadius _radius;
+    Positioned _position;
+
+    if (widget.isLeft && widget.isTop) {
+      _radius = BorderRadius.only(
+        bottomRight: Radius.circular(20),
+      );
+
+      _position = Positioned(
+          top: 0,
+          left: 0,
+          width: 124,
+          height: 54,
+          child: createButtonContent(_radius)
+      );
+    }
+
+    if (!widget.isLeft && widget.isTop) {
+      _radius = BorderRadius.only(
+        bottomLeft: Radius.circular(20),
+      );
+
+      _position = Positioned(
+          top: 0,
+          right: 0,
+          width: 124,
+          height: 54,
+          child: createButtonContent(_radius)
+      );
+    }
+
+    if (widget.isLeft && !widget.isTop) {
+      _radius = BorderRadius.only(
+        topRight: Radius.circular(20),
+      );
+
+      _position = Positioned(
+          bottom: 0,
+          left: 0,
+          width: 124,
+          height: 54,
+          child: createButtonContent(_radius)
+      );
+    }
+
+    if (!widget.isLeft && !widget.isTop) {
+      _radius = BorderRadius.only(
+        topLeft: Radius.circular(20),
+      );
+
+      _position = Positioned(
+        bottom: 0,
+        right: 0,
+        width: 124,
+        height: 54,
+        child: createButtonContent(_radius)
+      );
+    }
+
+    return _position;
   }
 }
