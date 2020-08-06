@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:party_games/Widgets/CornerInformation.dart';
+import 'package:party_games/Widgets/ThoughtsAndCrossesGridSquare.dart';
+import 'package:party_games/Widgets/Timer.dart';
 import 'package:signalr_core/signalr_core.dart';
 import '../presentation/custom_icons_icons.dart';
 
@@ -13,6 +16,8 @@ final connection = HubConnectionBuilder()
           logging: (level, message) => print(message),
         ))
     .build();
+
+
 
 class ThoughtsAndCrossesPage extends StatefulWidget {
   ThoughtsAndCrossesPage({Key key}) : super(key: key);
@@ -120,17 +125,82 @@ class ThoughtsAndCrossesGrid extends StatefulWidget {
 
 class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
 
+  final _topics = <String>[];
+  final _statuses = <bool>[];
+  final _guesses = <String>[];
+  var score = 0;
+  var letter = " ";
+
+  void _setUpGrid(List gridInfo) {
+    setState(() {
+      this._topics.clear();
+      this._statuses.clear();
+      this._guesses.clear();
+      gridInfo.forEach((item) {
+        this._topics.add(item["item1"]);
+        this._statuses.add(item["item3"]);
+        this._guesses.add(item["item2"]);
+      });
+      print(this._topics);
+    });
+  }
+
+  void _setScore(int newScore) {
+    setState(() {
+      this.score = newScore;
+    });
+  }
+
+  void _updateLetter(String newLetter) {
+    setState(() {
+      this.letter = newLetter;
+    });
+  }
+
+  Future _setUpConnections() async {
+    final name = 'Joshua';
+
+    Object topics;
+
+    connection.onclose((error) => print("Connection closed"));
+    await connection.start();
+    connection.on('LoggedInUsers', (message) => print(message.toString()));
+    connection.on('ReceiveLetter', (message) => _updateLetter(message[0]));
+    connection.on('ReceiveWordGrid', (message) => _setUpGrid(message[0]));
+    connection.on('ScoreCalculated', (message) => _setScore(message[0]));
+
+    print(">>> $topics");
+
+    await connection.invoke("AddToGroup", args: ['GroupOfJoshua']);
+    await connection.invoke("Startup", args: ['GroupOfJoshua', name, 0]);
+    await connection.invoke("SetupNewUser", args: ['GroupOfJoshua', name]);
+    await connection.invoke("AddToGroup", args: ['GroupOfJoshua']);
+    await connection.invoke('JoinRoom', args: ['GroupOfJoshua', name, 0]);
+  }
+
+  @override
+  void initState() {
+    _setUpConnections().then((value) {
+      print('Async done');
+    });
+    super.initState();
+  }
+
   Widget _buildGrid() {
-    final _topics = <String>['Topic 1', 'Topic 2', 'Topic 3', 'Topic 4', 'Topic 5', 'Topic 6', 'Topic 7', 'Topic 8', 'Topic 9'];
+//    final _topics = <String>['Topic 1', 'Topic 2', 'Topic 3', 'Topic 4', 'Topic 5', 'Topic 6', 'Topic 7', 'Topic 8', 'Topic 9'];
     final _gridItems = <Widget>[];
 
-    _topics.forEach((topic) => _gridItems.add(Container(
-      padding: EdgeInsets.all(4),
-      child: Center(
-        child: Text(topic),
-      ),
-      color: Colors.greenAccent[200],
-    )));
+    if(_topics.length == 9) {
+      for (var i = 0; i < 9; i++) {
+        _gridItems.add(
+          ThoughtsAndCrossesGridSquare(
+            topic: _topics[i],
+            isGuessed: _statuses[i],
+            userGuess: _guesses[i],
+          ),
+        );
+      }
+    }
 
     return GridView.count(
       crossAxisCount: 3,
@@ -149,6 +219,9 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
       ),
       home: Scaffold(
         backgroundColor: Color(0xFF8f92c9),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.play_arrow),
+        ),
         appBar: AppBar(
           title: Text('Thoughts & Crosses'),
         ),
@@ -158,31 +231,21 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
               icon: Icons.edit,
               isTop: true,
               isLeft: true,
-              text: 'A',
+              text: this.letter,
             ),
             CornerInformation(
               icon: Icons.alarm,
               isTop: true,
               isLeft: false,
-              text: 'B',
+              timerWidget: TimerWidget(
+                timerLength: 150,
+              ),
             ),
             CornerInformation(
               icon: CustomIcons.Trophy,
               isTop: false,
               isLeft: true,
-              text: 'C',
-            ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              width: 124,
-              height: 54,
-              child: Container(
-                child: Text('Hello'),
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                ),
-              ),
+              text: score.toString(),
             ),
             Center(
               child: SizedBox(
@@ -195,130 +258,5 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
         )
       ),
     );
-  }
-}
-
-class CornerInformation extends StatefulWidget {
-  final IconData icon;
-  final String text;
-  final bool isTop;
-  final bool isLeft;
-
-  CornerInformation(
-    {@required this.icon,
-    @required this.isTop,
-    @required this.isLeft,
-    @required this.text,
-    }
-  );
-
-  @override
-  _CornerInformationState createState() => _CornerInformationState();
-}
-
-class _CornerInformationState extends State<CornerInformation> {
-  @override
-  Widget build(BuildContext context)
-  {
-    createButtonContent(BorderRadius radius) {
-      return Container(
-        child: Center(
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget> [
-                Padding(
-                  padding: EdgeInsets.all(4),
-                  child: Icon(
-                    widget.icon,
-                    color: Color(0xFF55edbb),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(4),
-                  child: Text(
-                    widget.text,
-                    style: TextStyle(
-                      color: Color(0xFF55edbb),
-                      fontSize: 24,
-                    ),
-                  ),
-                ),
-              ]
-          ),
-        ),
-        decoration: BoxDecoration(
-          color: Color(0xFF8f92c9),
-          borderRadius: radius,
-          boxShadow: [
-            BoxShadow(
-                color: Color(0xFF55edbb),
-                spreadRadius: 4,
-                blurRadius: 4.0
-            ),
-          ],
-        ),
-      );
-    }
-
-    BorderRadius _radius;
-    Positioned _position;
-
-    if (widget.isLeft && widget.isTop) {
-      _radius = BorderRadius.only(
-        bottomRight: Radius.circular(20),
-      );
-
-      _position = Positioned(
-          top: 0,
-          left: 0,
-          width: 124,
-          height: 54,
-          child: createButtonContent(_radius)
-      );
-    }
-
-    if (!widget.isLeft && widget.isTop) {
-      _radius = BorderRadius.only(
-        bottomLeft: Radius.circular(20),
-      );
-
-      _position = Positioned(
-          top: 0,
-          right: 0,
-          width: 124,
-          height: 54,
-          child: createButtonContent(_radius)
-      );
-    }
-
-    if (widget.isLeft && !widget.isTop) {
-      _radius = BorderRadius.only(
-        topRight: Radius.circular(20),
-      );
-
-      _position = Positioned(
-          bottom: 0,
-          left: 0,
-          width: 124,
-          height: 54,
-          child: createButtonContent(_radius)
-      );
-    }
-
-    if (!widget.isLeft && !widget.isTop) {
-      _radius = BorderRadius.only(
-        topLeft: Radius.circular(20),
-      );
-
-      _position = Positioned(
-        bottom: 0,
-        right: 0,
-        width: 124,
-        height: 54,
-        child: createButtonContent(_radius)
-      );
-    }
-
-    return _position;
   }
 }
