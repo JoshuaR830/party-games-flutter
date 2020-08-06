@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'Pages/ThoughtsAndCrossesPage.dart';
 
+int countDown = 0;
+
 Future<void> main() async {
   runApp(PartyGames());
 }

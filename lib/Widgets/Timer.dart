@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:party_games/Pages/Dialog.dart';
+
+import '../main.dart';
 
 class TimerWidget extends StatefulWidget{
 
@@ -16,7 +19,6 @@ class TimerWidget extends StatefulWidget{
 
 class _TimerWidgetState extends State<TimerWidget> {
 
-  int countDown = 0;
   var timer;
 
   @override
@@ -42,6 +44,7 @@ class _TimerWidgetState extends State<TimerWidget> {
 
     if(countDown <= 0) {
       timer.cancel();
+      Future.delayed(Duration.zero, () => showDialog(context: context, builder: (BuildContext context) => loginDialog));
     }
 
     return Text(
