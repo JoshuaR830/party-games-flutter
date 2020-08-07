@@ -5,7 +5,7 @@ import 'package:party_games/Widgets/Timer.dart';
 import 'package:signalr_core/signalr_core.dart';
 import '../presentation/custom_icons_icons.dart';
 
-import 'Dialog.dart';
+import '../Dialogs/Dialog.dart';
 
 //final serverUrl = 'https://games-by-joshua.herokuapp.com/chatHub';
 final serverUrl = 'http://192.168.1.76:5001/chatHub';
@@ -16,8 +16,6 @@ final connection = HubConnectionBuilder()
           logging: (level, message) => print(message),
         ))
     .build();
-
-
 
 class ThoughtsAndCrossesPage extends StatefulWidget {
   ThoughtsAndCrossesPage({Key key}) : super(key: key);
@@ -157,6 +155,12 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
     });
   }
 
+  void resetGame() {
+    setState(() {
+
+    });
+  }
+
   Future _setUpConnections() async {
     final name = 'Joshua';
 
@@ -168,6 +172,8 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
     connection.on('ReceiveLetter', (message) => _updateLetter(message[0]));
     connection.on('ReceiveWordGrid', (message) => _setUpGrid(message[0]));
     connection.on('ScoreCalculated', (message) => _setScore(message[0]));
+//    connection.on('StartNewRound', (message) => print(message.toString()));
+
 
     print(">>> $topics");
 
@@ -238,7 +244,7 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
               isTop: true,
               isLeft: false,
               timerWidget: TimerWidget(
-                timerLength: 150,
+                timerLength: 30,
               ),
             ),
             CornerInformation(

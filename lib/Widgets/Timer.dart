@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:party_games/Pages/Dialog.dart';
+import 'package:party_games/Dialogs/TimerFinished.dart';
+import 'package:party_games/Pages/ThoughtsAndCrossesPage.dart';
 
 import '../main.dart';
 
@@ -10,7 +11,7 @@ class TimerWidget extends StatefulWidget{
   final int timerLength;
 
   TimerWidget({
-      @required this.timerLength
+    @required this.timerLength
   });
 
   @override
@@ -20,15 +21,28 @@ class TimerWidget extends StatefulWidget{
 class _TimerWidgetState extends State<TimerWidget> {
 
   var timer;
+  var isFinished;
 
   @override
   void initState() {
-    function();
+    listenForTimeReset();
+    function(widget.timerLength);
     super.initState();
   }
 
-  void function() {
-    countDown = widget.timerLength;
+  void listenForTimeReset() {
+    connection.on("ReceiveTimeStart", (time) => parseTime(time[0]));
+  }
+
+  void parseTime(List time) {
+    var seconds = time[0] * 60 + time[1];
+    function(seconds);
+  }
+
+  void function(time) {
+    print(time);
+    countDown = time;
+    isFinished = false;
     timer = new Timer.periodic(Duration(seconds: 1), (Timer t) => {
       setState(() {
         countDown --;
@@ -42,9 +56,10 @@ class _TimerWidgetState extends State<TimerWidget> {
     var seconds = countDown - (60 * minutes);
     var timerText = '${minutes.toString().padLeft(2, '0')} : ${seconds.toString().padLeft(2, '0')}';
 
-    if(countDown <= 0) {
+    if(countDown <= 0 && !isFinished) {
       timer.cancel();
-      Future.delayed(Duration.zero, () => showDialog(context: context, builder: (BuildContext context) => loginDialog));
+      isFinished = true;
+      Future.delayed(Duration.zero, () => showDialog(context: context, barrierDismissible: false, builder: (BuildContext context) => gameOverDialog));
     }
 
     return Text(
