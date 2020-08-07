@@ -30,8 +30,18 @@ dependencies:
   signalr_core: ^1.0.4
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.7.3
+
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path_android: "assets/icon/party-games-icon-android.png"
+  image_path_ios: "assets/icon/party-games-icon-ios.png"
+  adaptive_icon_background: "#8f92c9"
+  adaptive_icon_foreground: "assets/icon/party-games-icon-android-432x432.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
