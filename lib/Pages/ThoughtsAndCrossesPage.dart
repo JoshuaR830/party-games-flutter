@@ -2,20 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:party_games/Widgets/CornerInformation.dart';
 import 'package:party_games/Widgets/ThoughtsAndCrossesGridSquare.dart';
 import 'package:party_games/Widgets/Timer.dart';
-import 'package:signalr_core/signalr_core.dart';
+import '../main.dart';
 import '../presentation/custom_icons_icons.dart';
 
 import '../Dialogs/Dialog.dart';
-
-//final serverUrl = 'https://games-by-joshua.herokuapp.com/chatHub';
-final serverUrl = 'http://192.168.1.76:5001/chatHub';
-final connection = HubConnectionBuilder()
-    .withUrl(
-        serverUrl,
-        HttpConnectionOptions(
-          logging: (level, message) => print(message),
-        ))
-    .build();
+import 'ScorePage.dart';
 
 class ThoughtsAndCrossesPage extends StatefulWidget {
   ThoughtsAndCrossesPage({Key key}) : super(key: key);
@@ -25,45 +16,74 @@ class ThoughtsAndCrossesPage extends StatefulWidget {
 
 class _ThoughtsAndCrossesPageState extends State<ThoughtsAndCrossesPage> {
   final _loggedInUserList = <Widget>[];
+  bool isLoggedIn;
+  bool something;
+
+
+//  void startNewGame() {
+//    something = true;
+//
+//    // ToDo: There is a problem here - should be on timer start and then pass the time through and the timer should just start
+//
+//    print("Properly navigate");
+//    Navigator.of(context).push(
+//      MaterialPageRoute(
+//          builder: (context) => ThoughtsAndCrossesGrid()),
+//    );
+//  }
+
+  void startOnTimerStart(time) {
+    something = true;
+
+    var timerLength = time[0] * 60 + time[1];
+
+    print("Navigate on time");
+    Navigator.of(context).push(
+      MaterialPageRoute(
+          builder: (context) => ThoughtsAndCrossesGrid(timerLength: timerLength,)),
+    );
+  }
+
   Future _connectToHub() async {
-    connection.onclose((error) => print("Connection closed"));
-    await connection.start();
     connection.on('LoggedInUsers', (message) => renderStuff(message[0]));
-    connection.on('ReceiveLetter', (message) => print(message.toString()));
+    connection.on('ReceiveTimeStart', (message) => startOnTimerStart(message[0]));
   }
 
   renderStuff(List users) {
     _loggedInUserList.clear();
 
+    if (!mounted) {
+      return;
+    }
     setState(() {
+      isLoggedIn = true;
       users.forEach((user) => _loggedInUserList.add(ListTile(
-        title: Center(
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(8.0)),
-              color: Colors.deepPurple,
-            ),
-            child: SizedBox(
-              height: 48,
-              width: 200,
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Center(
-                  child: Text(user,
-                  style: TextStyle(
-                    color: Colors.white
-                  )),
+            title: Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                  color: Colors.deepPurple,
+                ),
+                child: SizedBox(
+                  height: 48,
+                  width: 200,
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Center(
+                      child: Text(user, style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      )));
+          )));
     });
   }
 
   @override
   void initState() {
+    isLoggedIn = false;
+    something = true;
     _connectToHub().then((value) {
       print('Async done');
     });
@@ -82,54 +102,128 @@ class _ThoughtsAndCrossesPageState extends State<ThoughtsAndCrossesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          RaisedButton(
-            onPressed: () async {
-              final name = await showDialog(
-                  context: context,
-                  builder: (BuildContext context) => loginDialog);
 
-              await connection.invoke("AddToGroup", args: ['GroupOfJoshua']);
-              await connection.invoke("Startup", args: ['GroupOfJoshua', name, 0]);
-              await connection.invoke("SetupNewUser", args: ['GroupOfJoshua', name]);
-              await connection.invoke("AddToGroup", args: ['GroupOfJoshua']);
-              await connection.invoke('JoinRoom', args: ['GroupOfJoshua', name, 0]);
+//    if(something && isLoggedIn) {
+//      print("Aaaannndd navigate");
+//      Future.delayed(Duration.zero, () => Navigator.of(context).push(
+//        MaterialPageRoute(
+//            builder: (context) => ThoughtsAndCrossesGrid()),
+//      ));
+
+//      something = false;
+//    }
+
+    return MaterialApp(
+      title: 'Thoughts & Crosses',
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+      ),
+      home: Scaffold(
+        backgroundColor: Color(0xFF8f92c9),
+        floatingActionButton: Visibility(
+          child: FloatingActionButton(
+            child: Icon(Icons.play_arrow),
+            onPressed: () {
+              connection.invoke("JoinRoom", args: ["GroupOfJoshua", "Joshua", 0]);
+              connection.invoke("StartServerGame", args: ["GroupOfJoshua", [2, 30]]);
+
+              // Need a way to invoke the application for all logged in users
+              // Need to find a way to make the context exist
+
+              // If I change a value that causes this to be rebuilt - sounds a bit hacky
+
+//              Navigator.of(context).push(
+//                MaterialPageRoute(
+//                    builder: (context) => ThoughtsAndCrossesGrid()),
+//              );
             },
-            color: Colors.deepPurple,
-            child: Text(
-              'Login',
-              style: TextStyle(
-                color: Colors.white,
-              ),
+          ),
+          visible: isLoggedIn,
+        ),
+        appBar: AppBar(
+          title: Text('Thoughts & Crosses'),
+          actions: <Widget>[
+            Visibility(
+              child: IconButton(
+                icon: Icon(CustomIcons.Trophy),
+                onPressed: () {
+                  print("Hello");
+                  Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ScorePage(),
+                      )
+                  );
+                },
             ),
+            visible: isLoggedIn,
+            ),
+          ],
+        ),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+          Visibility( child: RaisedButton(
+                onPressed: () async {
+                  final name = await showDialog(
+                      context: context,
+                      builder: (BuildContext context) => loginDialog);
+
+                  await connection.invoke("AddToGroup", args: ['GroupOfJoshua']);
+                  await connection.invoke("Startup", args: ['GroupOfJoshua', name, 0]);
+                  await connection.invoke("SetupNewUser", args: ['GroupOfJoshua', name]);
+                  await connection.invoke("AddToGroup", args: ['GroupOfJoshua']);
+                  await connection.invoke('ResetGame', args: ['GroupOfJoshua', name, 0]);
+                },
+                color: Colors.deepPurple,
+
+                child:Text(
+                  'Login',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+                visible: !isLoggedIn,
+              ),
+              Expanded(
+                child: _buildListItems(),
+              ),
+            ],
           ),
-          Expanded(
-            child: _buildListItems(),
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
 class ThoughtsAndCrossesGrid extends StatefulWidget {
-  ThoughtsAndCrossesGrid({Key key}) : super(key: key);
+
+  final int timerLength;
+
+  ThoughtsAndCrossesGrid(
+  {
+    @required this.timerLength
+  });
 
   _ThoughtsAndCrossesGridState createState() => _ThoughtsAndCrossesGridState();
 }
 
 class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
-
   final _topics = <String>[];
   final _statuses = <bool>[];
   final _guesses = <String>[];
   var score = 0;
   var letter = " ";
+  var isContinueButtonVisible = false;
 
   void _setUpGrid(List gridInfo) {
+    if (!mounted) {
+      return;
+    }
+
+    print("Setup word grid");
+
     setState(() {
       this._topics.clear();
       this._statuses.clear();
@@ -140,40 +234,66 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
         this._guesses.add(item["item2"]);
       });
       print(this._topics);
+      print(this._statuses);
+      print(this._guesses);
     });
   }
 
   void _setScore(int newScore) {
+    if (!mounted) {
+      return;
+    }
+
     setState(() {
       this.score = newScore;
     });
   }
 
   void _updateLetter(String newLetter) {
+    if (!mounted) {
+      return;
+    }
     setState(() {
       this.letter = newLetter;
     });
   }
 
-  void resetGame() {
-    setState(() {
+  void _allowCompletion(){
+    isContinueButtonVisible = true;
+  }
 
-    });
+  void resetGame() {
+    if (!mounted) {
+      return;
+    }
+    setState(() {});
+  }
+
+  void _submitScores() {
+    if(!mounted) return;
+    print("<><><><>");
+    connection.invoke("UpdateScoreBoard", args: ["GroupOfJoshua", "Joshua"]);
+    _setScore(0);
+    isContinueButtonVisible = false;
+//    Navigator.of(context).pop();
   }
 
   Future _setUpConnections() async {
     final name = 'Joshua';
 
+
     Object topics;
 
-    connection.onclose((error) => print("Connection closed"));
-    await connection.start();
+//    connection.onclose((error) => print("Connection closed"));
+//    await connection.start();
     connection.on('LoggedInUsers', (message) => print(message.toString()));
     connection.on('ReceiveLetter', (message) => _updateLetter(message[0]));
     connection.on('ReceiveWordGrid', (message) => _setUpGrid(message[0]));
     connection.on('ScoreCalculated', (message) => _setScore(message[0]));
-//    connection.on('StartNewRound', (message) => print(message.toString()));
+    connection.on("ReceiveCompleteRound", (result) => _allowCompletion());
+    connection.on("CompletedScores", (result) => _submitScores());
 
+//    connection.on('StartNewRound', (message) => print(message.toString()));
 
     print(">>> $topics");
 
@@ -181,7 +301,7 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
     await connection.invoke("Startup", args: ['GroupOfJoshua', name, 0]);
     await connection.invoke("SetupNewUser", args: ['GroupOfJoshua', name]);
     await connection.invoke("AddToGroup", args: ['GroupOfJoshua']);
-    await connection.invoke('JoinRoom', args: ['GroupOfJoshua', name, 0]);
+    await connection.invoke('ResetGame', args: ['GroupOfJoshua', name, 0]);
   }
 
   @override
@@ -196,7 +316,7 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
 //    final _topics = <String>['Topic 1', 'Topic 2', 'Topic 3', 'Topic 4', 'Topic 5', 'Topic 6', 'Topic 7', 'Topic 8', 'Topic 9'];
     final _gridItems = <Widget>[];
 
-    if(_topics.length == 9) {
+    if (_topics.length == 9) {
       for (var i = 0; i < 9; i++) {
         _gridItems.add(
           ThoughtsAndCrossesGridSquare(
@@ -208,11 +328,20 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
       }
     }
 
-    return GridView.count(
-      crossAxisCount: 3,
-      mainAxisSpacing: 10,
-      crossAxisSpacing: 10,
-      children: _gridItems,
+    return Padding(
+      padding: EdgeInsets.only(
+          top: 64,
+          bottom: 64,
+      ),
+      child: GridView.count(
+        crossAxisCount: 3,
+        physics: ClampingScrollPhysics(),
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        primary: true,
+
+        children: _gridItems,
+      )
     );
   }
 
@@ -224,45 +353,52 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
         primarySwatch: Colors.deepPurple,
       ),
       home: Scaffold(
-        backgroundColor: Color(0xFF8f92c9),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.play_arrow),
-        ),
-        appBar: AppBar(
-          title: Text('Thoughts & Crosses'),
-        ),
-        body: Stack(
-          children: <Widget>[
-            CornerInformation(
-              icon: Icons.edit,
-              isTop: true,
-              isLeft: true,
-              text: this.letter,
-            ),
-            CornerInformation(
-              icon: Icons.alarm,
-              isTop: true,
-              isLeft: false,
-              timerWidget: TimerWidget(
-                timerLength: 30,
+          backgroundColor: Color(0xFF8f92c9),
+          floatingActionButton: Visibility(
+            child: FloatingActionButton(
+              child: Icon(Icons.check),
+              onPressed: () {
+                print("<Hello>");
+                connection.invoke("CollectScores", args: ["GroupOfJoshua"]);
+                Navigator.pop(context);
+              },
+          ),
+          visible: isContinueButtonVisible,
+          ),
+          appBar: AppBar(
+            title: Text('Thoughts & Crosses'),
+          ),
+          body: Stack(
+            children: <Widget>[
+              Center(
+                child: SizedBox(
+                  width: 300,
+                  height: 500,
+                  child: _buildGrid(),
+                ),
               ),
-            ),
-            CornerInformation(
-              icon: CustomIcons.Trophy,
-              isTop: false,
-              isLeft: true,
-              text: score.toString(),
-            ),
-            Center(
-              child: SizedBox(
-                width: 300,
-                height: 300,
-                child: _buildGrid(),
+              CornerInformation(
+                icon: Icons.edit,
+                isTop: true,
+                isLeft: true,
+                text: this.letter,
               ),
-            ),
-          ],
-        )
-      ),
+              CornerInformation(
+                icon: Icons.alarm,
+                isTop: true,
+                isLeft: false,
+                timerWidget: TimerWidget(
+                  timerLength: widget.timerLength,
+                ),
+              ),
+              CornerInformation(
+                icon: CustomIcons.Trophy,
+                isTop: false,
+                isLeft: true,
+                text: score.toString(),
+              ),
+            ],
+          )),
     );
   }
 }

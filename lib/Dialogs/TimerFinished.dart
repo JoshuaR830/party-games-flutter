@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:party_games/Pages/ThoughtsAndCrossesPage.dart';
+
+import '../main.dart';
 
 int counter = 1;
 

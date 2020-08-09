@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:party_games/Pages/ThoughtsAndCrossesPage.dart';
+
+import '../main.dart';
 
 Map<String, dynamic> guesses;
 
@@ -35,12 +36,18 @@ class _ThoughtsAndCrossesGridSquareState
 //
 //    print(somethingElse[widget.topic]);
 //    print(guesses[widget.topic]);
+    if(!mounted) {
+      return;
+    }
     setState(() {
       displayInputs = false;
     });
   }
 
   void doSomethingElse() {
+    if(!mounted) {
+      return;
+    }
     setState(() {
       displayInputs = true;
     });
@@ -100,6 +107,9 @@ class _ThoughtsAndCrossesGridSquareState
       print("Not a thing");
       gridSquare = RaisedButton(
         onPressed: () {
+          if(!mounted) {
+            return;
+          }
           setState(() {
             if (thing) {
               thing = false;

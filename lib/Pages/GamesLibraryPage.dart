@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:party_games/Dialogs/Dialog.dart';
+import 'package:party_games/Pages/ThoughtsAndCrossesPage.dart';
 
-import '../LoginForm.dart';
-
-class GameCard extends StatelessWidget {
+class GameCard extends StatefulWidget {
 
   final String gameTitle;
   final String gameDescription;
@@ -13,6 +12,11 @@ class GameCard extends StatelessWidget {
     @required this.gameDescription,
   });
 
+  @override
+  _GameCardState createState() => _GameCardState();
+}
+
+class _GameCardState extends State<GameCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -41,7 +45,7 @@ class GameCard extends StatelessWidget {
             Padding(
               padding: EdgeInsets.all(8.0),
               child: Text(
-                  this.gameTitle,
+                  widget.gameTitle,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 24.0,
@@ -51,7 +55,7 @@ class GameCard extends StatelessWidget {
             Padding(
               padding: EdgeInsets.all(8.0),
               child: Text(
-                  this.gameDescription,
+                  widget.gameDescription,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16.0,
@@ -66,11 +70,14 @@ class GameCard extends StatelessWidget {
                     color: Colors.deepPurple,
                     onPressed: () async {
                       print("Ah");
-                      final result = await showDialog(
-                          context: context, builder: (BuildContext context) => loginDialog);
-                      Scaffold.of(context)
-                        ..removeCurrentSnackBar()
-                        ..showSnackBar(SnackBar(content: Text(result)));
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => ThoughtsAndCrossesPage()),
+                      );
+//                      final result = await showDialog(
+//                          context: context, builder: (BuildContext context) => loginDialog);
+//                      Scaffold.of(context)
+//                        ..removeCurrentSnackBar()
+//                        ..showSnackBar(SnackBar(content: Text(result)));
                     }
                 ),
               ],
@@ -80,6 +87,7 @@ class GameCard extends StatelessWidget {
       ),
     );
   }
+
 }
 
 class Something extends StatelessWidget {
