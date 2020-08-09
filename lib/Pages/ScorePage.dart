@@ -13,32 +13,130 @@ class _ScorePageState extends State<ScorePage> {
 
   Map<String, dynamic> allScores;
 
+  List<Widget> _buildList() {
+
+    if(allScores == null) {
+      return <Widget>[
+        ListTile(
+          title: Center(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                color: Colors.deepPurple,
+              ),
+              child: SizedBox(
+                height: 48,
+                width: 200,
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Center(
+                    child: Text(
+                      "Loading...",
+                      style: TextStyle(
+                          color: Colors.white
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ];
+    }
+    var users = allScores.keys;
+    var something = allScores["joshua"].length;
+
+    for(var i = 0; i < something; i++) {
+      print("Round ${i + 1}");
+
+
+      roundScoreList.add(
+        ListTile(
+          title: Center(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                color: Colors.deepPurple,
+              ),
+              child: SizedBox(
+                height: 48,
+                width: 200,
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Center(
+                    child: Text(
+                      "Round ${i + 1}",
+                      style: TextStyle(
+                          color: Colors.white
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      users.forEach((user) {
+        print(">>>${allScores[user]}");
+        print(user[0].toUpperCase() + user.substring(1));
+
+        roundScoreList.add(
+          ListTile(
+            title: Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                  color: Colors.deepPurple,
+                ),
+                child: SizedBox(
+                  height: 48,
+                  width: 200,
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Center(
+                      child: Text(
+                        "${user[0].toUpperCase() + user.substring(
+                            1)}: ${(allScores[user].length > i
+                            ? allScores[user][i]
+                            : 0)}",
+                        style: TextStyle(
+                            color: Colors.white
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
+
+        if (allScores[user].length > i) {
+          print(allScores[user][i]);
+        } else {
+          print(0);
+        }
+      });
+    }
+    return roundScoreList;
+  }
+
   void _doThis(scores) {
     if(!mounted) return;
     setState(() {
       allScores = scores;
 
-      var users = allScores.keys;
-      var something = allScores["joshua"].length;
-
       roundScoreList.clear();
-      for(var i = 0; i < something; i++) {
-        print("Round ${i+1}");
-        roundScoreList.add(Text("Round ${i+1}"),);
-        users.forEach((user) {
-          print(user[0].toUpperCase() + user.substring(1));
 
-          roundScoreList.add(Text("${user[0].toUpperCase() + user.substring(1)}: ${(allScores[user][i].length > i ? allScores[user][i] : 0)}"),);
-          if (allScores[user].length > i) {
-            print(allScores[user][i]);
-          } else {
-            print(0);
-          }
-
-        });
-      }
     });
+    print(roundScoreList);
   }
+
+
 
   @override
   void initState() {
@@ -49,6 +147,8 @@ class _ScorePageState extends State<ScorePage> {
 
   @override
   Widget build(BuildContext context) {
+    print("Updating scores");
+    print(this.roundScoreList);
     return Scaffold(
       backgroundColor: Color(0xFF8f92c9),
       appBar: AppBar(
@@ -58,7 +158,7 @@ class _ScorePageState extends State<ScorePage> {
         Expanded(
           child: ListView(
             shrinkWrap: true,
-            children: roundScoreList,
+            children: _buildList(),
           ),
         ),
       ]),
