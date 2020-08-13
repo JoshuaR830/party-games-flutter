@@ -121,6 +121,7 @@ class GamesLibraryPage extends StatelessWidget {
         title: 'Games Library',
         theme: ThemeData(
           primarySwatch: Colors.deepPurple,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         home: Something()
       );

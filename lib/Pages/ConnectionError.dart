@@ -9,6 +9,7 @@ class ConnectionErrorPage extends StatelessWidget {
       title: 'Connection Error',
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: Scaffold(
         backgroundColor: Color(0xFF8f92c9),
