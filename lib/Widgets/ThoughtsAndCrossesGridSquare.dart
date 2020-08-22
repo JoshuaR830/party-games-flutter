@@ -9,12 +9,14 @@ class ThoughtsAndCrossesGridSquare extends StatefulWidget {
   final String topic;
   final bool isGuessed;
   final String userGuess;
+  final double gridItemSize;
   final bool isInputMode;
 
   ThoughtsAndCrossesGridSquare({
     @required this.topic,
     @required this.isGuessed,
     @required this.userGuess,
+    @required this.gridItemSize,
     @required this.isInputMode,
   });
 
@@ -82,18 +84,18 @@ class _ThoughtsAndCrossesGridSquareState
           children: <Widget>[
             Positioned(
               top: 8,
-              child: SizedBox(
+              child: Container(
                 child: Text(
                   widget.topic,
                   textAlign: TextAlign.center,
                 ),
-                width: 80,
+                width: widget.gridItemSize - 20,
               ),
             ),
             Positioned(
               bottom: 8,
-              width: 80,
-              child: SizedBox(
+              width: widget.gridItemSize - 20,
+              child: Container(
                 child: GridForm(
                   topic: widget.topic,
                   userGuess: widget.userGuess,
@@ -113,12 +115,12 @@ class _ThoughtsAndCrossesGridSquareState
           setState(() {
             if (thing) {
               thing = false;
-              connection.invoke('SetIsValidForCategory', args: ['GroupOfJoshua', 'Joshua', widget.topic, thing]);
-              connection.invoke('CalculateScore', args: ['GroupOfJoshua', 'Joshua']);
+              connection.invoke('SetIsValidForCategory', args: [groupName, name, widget.topic, thing]);
+              connection.invoke('CalculateScore', args: [groupName, name]);
             } else {
               thing = true;
-              connection.invoke('SetIsValidForCategory', args: ['GroupOfJoshua', 'Joshua', widget.topic, thing]);
-              connection.invoke('CalculateScore', args: ['GroupOfJoshua', 'Joshua']);
+              connection.invoke('SetIsValidForCategory', args: [groupName, name, widget.topic, thing]);
+              connection.invoke('CalculateScore', args: [groupName, name]);
             }
           });
         },
@@ -129,12 +131,12 @@ class _ThoughtsAndCrossesGridSquareState
           children: <Widget>[
             Positioned(
               top: 8,
-              child: SizedBox(
+              child: Container(
                 child: Text(
                   widget.topic,
                   textAlign: TextAlign.center,
                 ),
-                width: 80,
+                width: widget.gridItemSize - 20,
               ),
             ),
             Positioned(
@@ -191,7 +193,7 @@ class _GridFormState extends State<GridForm> {
             style: TextStyle(color: Colors.black, height: 1, fontSize: 14, ),
           onChanged: (text) {
             print(text);
-            connection.invoke("SetGuessForCategory", args: ["GroupOfJoshua", "Joshua", widget.topic, text]);
+            connection.invoke("SetGuessForCategory", args: [groupName, name, widget.topic, text]);
           },
 
           decoration: InputDecoration(

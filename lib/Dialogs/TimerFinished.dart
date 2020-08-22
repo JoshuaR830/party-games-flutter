@@ -73,7 +73,7 @@ class _GameOverContentState extends State<GameOverContent> {
           RaisedButton(
             child: Text('End'),
             onPressed: () async {
-              await connection.invoke("CompleteRound", args: ["GroupOfJoshua"]);
+              await connection.invoke("CompleteRound", args: [groupName]);
             },
           ),
         ],

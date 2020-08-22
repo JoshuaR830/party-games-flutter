@@ -64,8 +64,8 @@ class _ThoughtsAndCrossesPageState extends State<ThoughtsAndCrossesPage> {
                   borderRadius: BorderRadius.all(Radius.circular(8.0)),
                   color: Colors.deepPurple,
                 ),
-                child: SizedBox(
-                  height: 48,
+                child: Container(
+
                   width: 200,
                   child: Padding(
                     padding: EdgeInsets.all(16),
@@ -124,8 +124,8 @@ class _ThoughtsAndCrossesPageState extends State<ThoughtsAndCrossesPage> {
           child: FloatingActionButton(
             child: Icon(Icons.play_arrow),
             onPressed: () {
-              connection.invoke("JoinRoom", args: ["GroupOfJoshua", "Joshua", 0]);
-              connection.invoke("StartServerGame", args: ["GroupOfJoshua", [2, 30]]);
+              connection.invoke("JoinRoom", args: [groupName, name, 0]);
+              connection.invoke("StartServerGame", args: [groupName, [2, 30]]);
 
               // Need a way to invoke the application for all logged in users
               // Need to find a way to make the context exist
@@ -169,11 +169,11 @@ class _ThoughtsAndCrossesPageState extends State<ThoughtsAndCrossesPage> {
                       context: context,
                       builder: (BuildContext context) => loginDialog);
 
-                  await connection.invoke("AddToGroup", args: ['GroupOfJoshua']);
-                  await connection.invoke("Startup", args: ['GroupOfJoshua', name, 0]);
-                  await connection.invoke("SetupNewUser", args: ['GroupOfJoshua', name]);
-                  await connection.invoke("AddToGroup", args: ['GroupOfJoshua']);
-                  await connection.invoke('ResetGame', args: ['GroupOfJoshua', name, 0]);
+                  await connection.invoke("AddToGroup", args: [groupName]);
+                  await connection.invoke("Startup", args: [groupName, name, 0]);
+                  await connection.invoke("SetupNewUser", args: [groupName, name]);
+                  await connection.invoke("AddToGroup", args: [groupName]);
+                  await connection.invoke('ResetGame', args: [groupName, name, 0]);
                 },
                 color: Colors.deepPurple,
 
@@ -272,16 +272,13 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
   void _submitScores() {
     if(!mounted) return;
     print("<><><><>");
-    connection.invoke("UpdateScoreBoard", args: ["GroupOfJoshua", "Joshua"]);
+    connection.invoke("UpdateScoreBoard", args: [groupName, name]);
     _setScore(0);
     isContinueButtonVisible = false;
-//    Navigator.of(context).pop();
+    Navigator.of(context).pop();
   }
 
   Future _setUpConnections() async {
-    final name = 'Joshua';
-
-
     Object topics;
 
 //    connection.onclose((error) => print("Connection closed"));
@@ -297,11 +294,11 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
 
     print(">>> $topics");
 
-    await connection.invoke("AddToGroup", args: ['GroupOfJoshua']);
-    await connection.invoke("Startup", args: ['GroupOfJoshua', name, 0]);
-    await connection.invoke("SetupNewUser", args: ['GroupOfJoshua', name]);
-    await connection.invoke("AddToGroup", args: ['GroupOfJoshua']);
-    await connection.invoke('ResetGame', args: ['GroupOfJoshua', name, 0]);
+    await connection.invoke("AddToGroup", args: [groupName]);
+    await connection.invoke("Startup", args: [groupName, name, 0]);
+    await connection.invoke("SetupNewUser", args: [groupName, name]);
+    await connection.invoke("AddToGroup", args: [groupName]);
+    await connection.invoke('ResetGame', args: [groupName, name, 0]);
   }
 
   @override
@@ -312,7 +309,7 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
     super.initState();
   }
 
-  Widget _buildGrid() {
+  Widget _buildGrid(double gridItemSize) {
 //    final _topics = <String>['Topic 1', 'Topic 2', 'Topic 3', 'Topic 4', 'Topic 5', 'Topic 6', 'Topic 7', 'Topic 8', 'Topic 9'];
     final _gridItems = <Widget>[];
 
@@ -323,6 +320,7 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
             topic: _topics[i],
             isGuessed: _statuses[i],
             userGuess: _guesses[i],
+            gridItemSize: gridItemSize
           ),
         );
       }
@@ -347,6 +345,12 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
 
   @override
   Widget build(BuildContext context) {
+    final sizeContext = MediaQuery.of(context);
+
+    var width = MediaQuery.of(context).size.width - 32;
+    var height = sizeContext.size.height - kToolbarHeight - 108 - sizeContext.padding.top - sizeContext.padding.bottom;
+    final gridSize = height > width ? width : height;
+
     return MaterialApp(
       title: 'Thoughts & Crosses',
       theme: ThemeData(
@@ -360,8 +364,10 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
               child: Icon(Icons.check),
               onPressed: () {
                 print("<Hello>");
-                connection.invoke("CollectScores", args: ["GroupOfJoshua"]);
-                Navigator.pop(context);
+                connection.invoke("CollectScores", args: [groupName]);
+
+                // Somehow need to pop the context for everyone - not just the person who presses it
+//                Navigator.pop(context);
               },
           ),
           visible: isContinueButtonVisible,
@@ -372,10 +378,10 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
           body: Stack(
             children: <Widget>[
               Center(
-                child: SizedBox(
-                  width: 300,
-                  height: 500,
-                  child: _buildGrid(),
+                child: Container(
+                  width: gridSize,
+                  height: gridSize + 128,
+                  child: _buildGrid((gridSize - 16)/3),
                 ),
               ),
               CornerInformation(

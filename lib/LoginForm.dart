@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'main.dart';
+
 class LoginForm extends StatefulWidget {
   @override
   LoginFormState createState() {
@@ -44,6 +46,7 @@ class LoginFormState extends State<LoginForm> {
               RaisedButton(
                 color: Colors.deepPurple,
                 onPressed: () {
+                  name = userNameController.text;
                   if (_formKey.currentState.validate()) {
                     Navigator.pop(context, userNameController.text);
                   }

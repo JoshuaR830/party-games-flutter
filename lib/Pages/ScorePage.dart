@@ -24,8 +24,7 @@ class _ScorePageState extends State<ScorePage> {
                 borderRadius: BorderRadius.all(Radius.circular(8.0)),
                 color: Colors.deepPurple,
               ),
-              child: SizedBox(
-                height: 48,
+              child: Container(
                 width: 200,
                 child: Padding(
                   padding: EdgeInsets.all(16),
@@ -44,8 +43,10 @@ class _ScorePageState extends State<ScorePage> {
         ),
       ];
     }
-    var users = allScores.keys;
-    var something = allScores["joshua"].length;
+    var users = allScores.keys.toList();
+    var something = allScores[users[0]].length;
+    var totalUserScores = Map<String, int>();
+
 
     for(var i = 0; i < something; i++) {
       print("Round ${i + 1}");
@@ -57,10 +58,9 @@ class _ScorePageState extends State<ScorePage> {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                color: Colors.deepPurple,
+                color: Colors.white30
               ),
-              child: SizedBox(
-                height: 48,
+              child: Container(
                 width: 200,
                 child: Padding(
                   padding: EdgeInsets.all(16),
@@ -68,7 +68,8 @@ class _ScorePageState extends State<ScorePage> {
                     child: Text(
                       "Round ${i + 1}",
                       style: TextStyle(
-                          color: Colors.white
+                          color: Colors.deepPurple,
+                          decoration: TextDecoration.underline
                       ),
                     ),
                   ),
@@ -79,10 +80,16 @@ class _ScorePageState extends State<ScorePage> {
         ),
       );
 
+
+
+
       users.forEach((user) {
+        totalUserScores.putIfAbsent(user, () => 0);
         print(">>>${allScores[user]}");
         print(user[0].toUpperCase() + user.substring(1));
 
+        totalUserScores[user] = totalUserScores[user] + (allScores[user].length > i ? allScores[user][i] : 0);
+        print(totalUserScores);
         roundScoreList.add(
           ListTile(
             title: Center(
@@ -91,8 +98,7 @@ class _ScorePageState extends State<ScorePage> {
                   borderRadius: BorderRadius.all(Radius.circular(8.0)),
                   color: Colors.deepPurple,
                 ),
-                child: SizedBox(
-                  height: 48,
+                child: Container(
                   width: 200,
                   child: Padding(
                     padding: EdgeInsets.all(16),
@@ -122,6 +128,93 @@ class _ScorePageState extends State<ScorePage> {
         }
       });
     }
+
+
+
+    roundScoreList.insert(0,  ListTile(
+      title: Center(
+        child: Container(
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(8.0)),
+              color: Colors.white30
+          ),
+          child: Container(
+            width: 200,
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(
+                child: Text(
+                  "Each round",
+                  style: TextStyle(
+                      color: Colors.deepPurple,
+                      decoration: TextDecoration.underline
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+    );
+
+    users.forEach((user) {
+      roundScoreList.insert(0, ListTile(
+        title: Center(
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(8.0)),
+              color: Colors.deepPurple,
+            ),
+            child: Container(
+              width: 200,
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Center(
+                  child: Text(
+                    "${user[0].toUpperCase()}${user.substring(1)} ${totalUserScores[user]}",
+                    style: TextStyle(
+                        color: Colors.white
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+      );
+    });
+
+
+  roundScoreList.insert(0,  ListTile(
+    title: Center(
+      child: Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            color: Colors.white30
+        ),
+        child: Container(
+          width: 200,
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Center(
+              child: Text(
+                "Total scores",
+                style: TextStyle(
+                    color: Colors.deepPurple,
+                    decoration: TextDecoration.underline
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  ),
+  );
+
+
     return roundScoreList;
   }
 
@@ -141,7 +234,7 @@ class _ScorePageState extends State<ScorePage> {
   @override
   void initState() {
     connection.on("ScoreBoard", (scores) => _doThis(scores[0]));
-    connection.invoke("GetScores", args: ["GroupOfJoshua", 0]);
+    connection.invoke("GetScores", args: [groupName, 0]);
     super.initState();
   }
 

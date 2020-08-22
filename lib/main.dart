@@ -5,6 +5,8 @@ import 'Pages/ConnectionError.dart';
 import 'Pages/ThoughtsAndCrossesPage.dart';
 
 int countDown = 0;
+String name = 'Joshua';
+String groupName = 'GroupOfJoshua';
 
 Future<void> main() async {
   setupConnection();

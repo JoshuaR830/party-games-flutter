@@ -78,6 +78,8 @@ class _CornerInformationState extends State<CornerInformation> {
     BorderRadius _radius;
     Positioned _position;
 
+    final boxWidth =  MediaQuery.of(context).size.width/3;
+
     if (widget.isLeft && widget.isTop) {
       _radius = BorderRadius.only(
         bottomRight: Radius.circular(20),
@@ -86,7 +88,7 @@ class _CornerInformationState extends State<CornerInformation> {
       _position = Positioned(
           top: 0,
           left: 0,
-          width: 124,
+          width: boxWidth,
           height: 54,
           child: createButtonContent(_radius)
       );
@@ -100,7 +102,7 @@ class _CornerInformationState extends State<CornerInformation> {
       _position = Positioned(
           top: 0,
           right: 0,
-          width: 124,
+          width: boxWidth,
           height: 54,
           child: createButtonContent(_radius)
       );
@@ -114,7 +116,7 @@ class _CornerInformationState extends State<CornerInformation> {
       _position = Positioned(
           bottom: 0,
           left: 0,
-          width: 124,
+          width: boxWidth,
           height: 54,
           child: createButtonContent(_radius)
       );
@@ -128,7 +130,7 @@ class _CornerInformationState extends State<CornerInformation> {
       _position = Positioned(
           bottom: 0,
           right: 0,
-          width: 124,
+          width: boxWidth,
           height: 54,
           child: createButtonContent(_radius)
       );
