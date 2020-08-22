@@ -50,6 +50,9 @@ class _ThoughtsAndCrossesPageState extends State<ThoughtsAndCrossesPage> {
   }
 
   renderStuff(List users) {
+
+    if(name == "") return;
+
     _loggedInUserList.clear();
 
     if (!mounted) {
@@ -259,7 +262,12 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
   }
 
   void _allowCompletion(){
-    isContinueButtonVisible = true;
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      isContinueButtonVisible = true;
+    });
   }
 
   void resetGame() {
@@ -298,7 +306,7 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
     await connection.invoke("Startup", args: [groupName, name, 0]);
     await connection.invoke("SetupNewUser", args: [groupName, name]);
     await connection.invoke("AddToGroup", args: [groupName]);
-    await connection.invoke('ResetGame', args: [groupName, name, 0]);
+//    await connection.invoke('ResetGame', args: [groupName, name, 0]);
   }
 
   @override
@@ -320,7 +328,7 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
             topic: _topics[i],
             isGuessed: _statuses[i],
             userGuess: _guesses[i],
-            gridItemSize: gridItemSize
+            gridItemSize: gridItemSize,
           ),
         );
       }

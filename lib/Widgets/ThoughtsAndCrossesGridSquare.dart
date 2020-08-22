@@ -10,14 +10,12 @@ class ThoughtsAndCrossesGridSquare extends StatefulWidget {
   final bool isGuessed;
   final String userGuess;
   final double gridItemSize;
-  final bool isInputMode;
 
   ThoughtsAndCrossesGridSquare({
     @required this.topic,
     @required this.isGuessed,
     @required this.userGuess,
     @required this.gridItemSize,
-    @required this.isInputMode,
   });
 
   @override
