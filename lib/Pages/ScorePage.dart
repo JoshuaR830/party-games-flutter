@@ -10,34 +10,20 @@ class ScorePage extends StatefulWidget {
 class _ScorePageState extends State<ScorePage> {
 
   var roundScoreList = <Widget>[];
+  var totalScoreList = <Widget>[];
 
   Map<String, dynamic> allScores;
 
   List<Widget> _buildList() {
-
+    print("Broken down");
+    roundScoreList.clear();
     if(allScores == null) {
       return <Widget>[
-        ListTile(
-          title: Center(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                color: Colors.deepPurple,
-              ),
-              child: Container(
-                width: 200,
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Center(
-                    child: Text(
-                      "Loading...",
-                      style: TextStyle(
-                          color: Colors.white
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+        Center(
+          child: Padding(
+            padding: EdgeInsets.only(top: 64),
+            child: CircularProgressIndicator(
+              backgroundColor: Color(0xFF8f92c9),
             ),
           ),
         ),
@@ -57,8 +43,8 @@ class _ScorePageState extends State<ScorePage> {
           title: Center(
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                color: Colors.white30
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                  color: Colors.white30
               ),
               child: Container(
                 width: 200,
@@ -79,9 +65,6 @@ class _ScorePageState extends State<ScorePage> {
           ),
         ),
       );
-
-
-
 
       users.forEach((user) {
         totalUserScores.putIfAbsent(user, () => 0);
@@ -128,38 +111,40 @@ class _ScorePageState extends State<ScorePage> {
         }
       });
     }
+      return roundScoreList;
+    }
 
 
-
-    roundScoreList.insert(0,  ListTile(
-      title: Center(
-        child: Container(
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(8.0)),
-              color: Colors.white30
-          ),
-          child: Container(
-            width: 200,
+    List<Widget> _buildTotal() {
+      print("Total");
+      totalScoreList.clear();
+      if(allScores == null) {
+        return <Widget>[
+          Center(
             child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Center(
-                child: Text(
-                  "Each round",
-                  style: TextStyle(
-                      color: Colors.deepPurple,
-                      decoration: TextDecoration.underline
-                  ),
-                ),
+              padding: EdgeInsets.only(top: 64),
+              child: CircularProgressIndicator(
+                backgroundColor: Color(0xFF8f92c9),
               ),
             ),
           ),
-        ),
-      ),
-    ),
-    );
+        ];
+      }
+
+      var users = allScores.keys.toList();
+      var totalUserScores = Map<String, int>();
+
+      users.forEach((user) {
+        for(var i = 0; i < allScores[user].length; i++) {
+          totalUserScores.putIfAbsent(user, () => 0);
+
+          totalUserScores[user] = totalUserScores[user] +
+              (allScores[user].length > i ? allScores[user][i] : 0);
+        }
+      });
 
     users.forEach((user) {
-      roundScoreList.insert(0, ListTile(
+      totalScoreList.insert(0, ListTile(
         title: Center(
           child: Container(
             decoration: BoxDecoration(
@@ -186,36 +171,7 @@ class _ScorePageState extends State<ScorePage> {
       );
     });
 
-
-  roundScoreList.insert(0,  ListTile(
-    title: Center(
-      child: Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(8.0)),
-            color: Colors.white30
-        ),
-        child: Container(
-          width: 200,
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Center(
-              child: Text(
-                "Total scores",
-                style: TextStyle(
-                    color: Colors.deepPurple,
-                    decoration: TextDecoration.underline
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
-  ),
-  );
-
-
-    return roundScoreList;
+    return totalScoreList;
   }
 
   void _doThis(scores) {
@@ -242,19 +198,49 @@ class _ScorePageState extends State<ScorePage> {
   Widget build(BuildContext context) {
     print("Updating scores");
     print(this.roundScoreList);
-    return Scaffold(
-      backgroundColor: Color(0xFF8f92c9),
-      appBar: AppBar(
-        title: Text("Thoughts & Crosses Scores"),
-      ),
-      body: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-        Expanded(
-          child: ListView(
-            shrinkWrap: true,
-            children: _buildList(),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: Color(0xFF8f92c9),
+        appBar: AppBar(
+          bottom: TabBar(
+            tabs: [
+                Tab(text: 'Total scores'),
+                Tab(text: 'Round scores'),
+            ],
           ),
+          title: Text("Thoughts & Crosses Scores"),
         ),
-      ]),
+        body: TabBarView(
+          children: [
+            Container(child:
+            Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+              Expanded(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: _buildTotal(),
+                ),
+              ),
+            ]),
+            ),
+            Container(
+              child:
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+
+                Expanded(
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: _buildList(),
+                  ),
+                ),
+              ],
+            ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
