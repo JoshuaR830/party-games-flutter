@@ -141,7 +141,7 @@ class _ThoughtsAndCrossesGridSquareState
               bottom: 8,
               child: SizedBox(
                 child: Text(widget.userGuess, textAlign: TextAlign.center),
-                width: 80,
+                width: widget.gridItemSize - 20,
               ),
             ),
           ],

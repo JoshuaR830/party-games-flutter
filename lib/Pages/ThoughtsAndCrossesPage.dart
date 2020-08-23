@@ -172,6 +172,10 @@ class _ThoughtsAndCrossesPageState extends State<ThoughtsAndCrossesPage> {
                       context: context,
                       builder: (BuildContext context) => loginDialog);
 
+                  if(name == "Cancelled" || name == null) {
+                    return;
+                  }
+
                   await connection.invoke("AddToGroup", args: [groupName]);
                   await connection.invoke("Startup", args: [groupName, name, 0]);
                   await connection.invoke("SetupNewUser", args: [groupName, name]);
@@ -289,24 +293,11 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
   Future _setUpConnections() async {
     Object topics;
 
-//    connection.onclose((error) => print("Connection closed"));
-//    await connection.start();
-    connection.on('LoggedInUsers', (message) => print(message.toString()));
-    connection.on('ReceiveLetter', (message) => _updateLetter(message[0]));
-    connection.on('ReceiveWordGrid', (message) => _setUpGrid(message[0]));
-    connection.on('ScoreCalculated', (message) => _setScore(message[0]));
-    connection.on("ReceiveCompleteRound", (result) => _allowCompletion());
-    connection.on("CompletedScores", (result) => _submitScores());
-
-//    connection.on('StartNewRound', (message) => print(message.toString()));
-
-    print(">>> $topics");
-
     await connection.invoke("AddToGroup", args: [groupName]);
     await connection.invoke("Startup", args: [groupName, name, 0]);
     await connection.invoke("SetupNewUser", args: [groupName, name]);
     await connection.invoke("AddToGroup", args: [groupName]);
-//    await connection.invoke('ResetGame', args: [groupName, name, 0]);
+    await connection.invoke('ResetGame', args: [groupName, name, 0]);
   }
 
   @override

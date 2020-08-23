@@ -35,6 +35,10 @@ class LoginFormState extends State<LoginForm> {
                 ),
               ),
               TextFormField(
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                ),
                 controller: userNameController,
                 validator: (value) {
                   if (value.isEmpty) {
