@@ -27,6 +27,7 @@ class _ThoughtsAndCrossesPageState extends State<ThoughtsAndCrossesPage> {
     var timerLength = time[0] * 60 + time[1];
 
     print("Navigate on time");
+    print(context);
     Navigator.of(context).push(
       MaterialPageRoute(
           builder: (context) => ThoughtsAndCrossesGrid(timerLength: timerLength,)),
@@ -260,6 +261,13 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
   Future _setUpConnections() async {
     Object topics;
 
+    connection.on('LoggedInUsers', (message) => print(message.toString()));
+    connection.on('ReceiveLetter', (message) => _updateLetter(message[0]));
+    connection.on('ReceiveWordGrid', (message) => _setUpGrid(message[0]));
+    connection.on('ScoreCalculated', (message) => _setScore(message[0]));
+    connection.on("ReceiveCompleteRound", (result) => _allowCompletion());
+    connection.on("CompletedScores", (result) => _submitScores());
+
     await connection.invoke("AddToGroup", args: [groupName]);
     await connection.invoke("Startup", args: [groupName, name, 0]);
     await connection.invoke("SetupNewUser", args: [groupName, name]);
@@ -270,7 +278,7 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
   @override
   void initState() {
     _setUpConnections().then((value) {
-      print('Async done');
+      print('>>>Async done');
     });
     super.initState();
   }
