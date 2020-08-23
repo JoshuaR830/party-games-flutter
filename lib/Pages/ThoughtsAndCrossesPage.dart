@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:party_games/Widgets/CornerInformation.dart';
+import 'package:party_games/Widgets/LogInItem.dart';
 import 'package:party_games/Widgets/ThoughtsAndCrossesGridSquare.dart';
 import 'package:party_games/Widgets/Timer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
 import '../presentation/custom_icons_icons.dart';
 
@@ -18,19 +20,6 @@ class _ThoughtsAndCrossesPageState extends State<ThoughtsAndCrossesPage> {
   final _loggedInUserList = <Widget>[];
   bool isLoggedIn;
   bool something;
-
-
-//  void startNewGame() {
-//    something = true;
-//
-//    // ToDo: There is a problem here - should be on timer start and then pass the time through and the timer should just start
-//
-//    print("Properly navigate");
-//    Navigator.of(context).push(
-//      MaterialPageRoute(
-//          builder: (context) => ThoughtsAndCrossesGrid()),
-//    );
-//  }
 
   void startOnTimerStart(time) {
     something = true;
@@ -60,26 +49,18 @@ class _ThoughtsAndCrossesPageState extends State<ThoughtsAndCrossesPage> {
     }
     setState(() {
       isLoggedIn = true;
-      users.forEach((user) => _loggedInUserList.add(ListTile(
-            title: Center(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                  color: Colors.deepPurple,
-                ),
-                child: Container(
 
-                  width: 200,
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Center(
-                      child: Text(user, style: TextStyle(color: Colors.white)),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          )));
+      _loggedInUserList.add(LogInItem(
+        backgroundColor: Colors.white30,
+        textColor: Colors.deepPurple,
+        text: groupName,
+      ));
+
+      users.forEach((user) => _loggedInUserList.add(LogInItem(
+        backgroundColor: Colors.deepPurple,
+        textColor: Colors.white,
+        text: user,
+      )));
     });
   }
 
@@ -105,17 +86,6 @@ class _ThoughtsAndCrossesPageState extends State<ThoughtsAndCrossesPage> {
 
   @override
   Widget build(BuildContext context) {
-
-//    if(something && isLoggedIn) {
-//      print("Aaaannndd navigate");
-//      Future.delayed(Duration.zero, () => Navigator.of(context).push(
-//        MaterialPageRoute(
-//            builder: (context) => ThoughtsAndCrossesGrid()),
-//      ));
-
-//      something = false;
-//    }
-
     return MaterialApp(
       title: 'Thoughts & Crosses',
       theme: ThemeData(
@@ -129,16 +99,6 @@ class _ThoughtsAndCrossesPageState extends State<ThoughtsAndCrossesPage> {
             onPressed: () {
               connection.invoke("JoinRoom", args: [groupName, name, 0]);
               connection.invoke("StartServerGame", args: [groupName, [2, 30]]);
-
-              // Need a way to invoke the application for all logged in users
-              // Need to find a way to make the context exist
-
-              // If I change a value that causes this to be rebuilt - sounds a bit hacky
-
-//              Navigator.of(context).push(
-//                MaterialPageRoute(
-//                    builder: (context) => ThoughtsAndCrossesGrid()),
-//              );
             },
           ),
           visible: isLoggedIn,
@@ -168,11 +128,18 @@ class _ThoughtsAndCrossesPageState extends State<ThoughtsAndCrossesPage> {
             children: <Widget>[
           Visibility( child: RaisedButton(
                 onPressed: () async {
-                  final name = await showDialog(
+                  final loginData = await showDialog(
                       context: context,
                       builder: (BuildContext context) => loginDialog);
 
-                  if(name == "Cancelled" || name == null) {
+                  name = loginData.name;
+                  groupName = loginData.groupName;
+
+                  final preferences = await SharedPreferences.getInstance();
+                  await preferences.setString('userName', name);
+                  await preferences.setString('groupName', groupName);
+
+                  if(name == "Cancelled" || name == null || groupName == "Cancelled" || groupName == null) {
                     return;
                   }
 
@@ -309,7 +276,6 @@ class _ThoughtsAndCrossesGridState extends State<ThoughtsAndCrossesGrid> {
   }
 
   Widget _buildGrid(double gridItemSize) {
-//    final _topics = <String>['Topic 1', 'Topic 2', 'Topic 3', 'Topic 4', 'Topic 5', 'Topic 6', 'Topic 7', 'Topic 8', 'Topic 9'];
     final _gridItems = <Widget>[];
 
     if (_topics.length == 9) {

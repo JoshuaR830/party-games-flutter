@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:party_games/Pages/GamesLibraryPage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signalr_core/signalr_core.dart';
 import 'Pages/ConnectionError.dart';
 import 'Pages/ThoughtsAndCrossesPage.dart';
 
 int countDown = 0;
 String name = '';
-String groupName = 'GroupOfJoshua';
+String groupName = 'default';
 
 Future<void> main() async {
   setupConnection();
@@ -34,7 +35,27 @@ final connection = HubConnectionBuilder()
     ))
     .build();
 
-class PartyGames extends StatelessWidget {
+class PartyGames extends StatefulWidget {
+  @override
+  _PartyGamesState createState() => _PartyGamesState();
+}
+
+class _PartyGamesState extends State<PartyGames> {
+
+  _setupExistingData() async {
+    final preferences = await SharedPreferences.getInstance();
+    name = preferences.getString('userName');
+    groupName = preferences.getString('groupName') ?? 'default';
+    print(groupName);
+  }
+
+  @override
+  void initState() {
+    _setupExistingData().then((value) {
+      print("Async done");
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

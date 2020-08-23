@@ -157,7 +157,7 @@ class _ScorePageState extends State<ScorePage> {
                 padding: EdgeInsets.all(16),
                 child: Center(
                   child: Text(
-                    "${user[0].toUpperCase()}${user.substring(1)} ${totalUserScores[user]}",
+                    "${user[0].toUpperCase()}${user.substring(1)}: ${totalUserScores[user]??0}",
                     style: TextStyle(
                         color: Colors.white
                     ),
